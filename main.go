@@ -2,7 +2,6 @@ package main
 
 import (
 	"color-kwing/api"
-	"fmt"
 )
 
 func main() {
@@ -17,10 +16,10 @@ func main() {
 
 	val, err := api.NewRgbFromHex("#4B6F44")
 	if err != nil {
-		fmt.Errorf("Error: %v", err)
+		api.Logg.Error().Err(err).Msg("[Error Occurred]")
 	}
-	fmt.Printf("val: %v\n", val)
 
+	api.Logg.Info().Any("val", val).Msg("[FINAL VALUE]")
 }
 
 var arrOffColors [1240][2]string = [...][2]string{{"Absolute Zero", "#0048BA"},

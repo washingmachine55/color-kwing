@@ -9,145 +9,10 @@ import (
 
 var Logg = logger.Get()
 
-type conversions interface {
-	HexToRgb() string
-	HexToHsl() string
-	HexToHsv() string
-}
-
-type hexNumberInidividual struct {
-	R [2]Hex
-	G [2]Hex
-	B [2]Hex
-}
-
-type RgbNumbersInidividual struct {
-	R uint8
-	G uint8
-	B uint8
-}
-
-const hash rune = '#'
-
-// type HexCode struct {
-// 	hash   rune
-// 	number hexNumberInidividual
-// }
-
-type hexNumbersString [6]Hex
-type hexCodeString []rune
-
-func (h hexCodeString) toHex(start, end uint8) [2]Hex {
-	// aba := [2]Hex{(rune(h[start])), rune((h[end]))}
-
-	var a, b uint64
-
-	Logg.Info().
-		Any("start", rune(h[start])-'0').
-		Any("end", rune(h[end])-'0').
-		Bool("String", false).Msg("toHex Old")
-
-	Logg.Info().
-		Str("start", string(rune(h[start]))).
-		Str("end", string(rune(h[end]))).
-		Bool("String", true).Msg("toHex New")
-
-	stringToInt := func(startOrEnd uint64, isStart bool) (toReplace uint64) {
-		ifstatement := func(hex Hex) uint64 {
-			if isStart {
-				return uint64(_A * 16)
-			} else {
-				return uint64(hex)
-			}
-		}
-		switch alphabeticRune := string(rune(h[startOrEnd])); alphabeticRune {
-		case "A":
-			toReplace = ifstatement(_A)
-		case "B":
-			toReplace = ifstatement(_B)
-		case "C":
-			toReplace = ifstatement(_C)
-		case "D":
-			toReplace = ifstatement(_D)
-		case "E":
-			toReplace = ifstatement(_E)
-		case "F":
-			toReplace = ifstatement(_F)
-		default:
-			var err error
-			toReplace, err = strconv.ParseUint(string(rune(h[startOrEnd])), 10, 8)
-			if err != nil {
-				fmt.Errorf("%v", err)
-			}
-		}
-		return toReplace
-	}
-
-	a = stringToInt(uint64(start), true)
-	b = stringToInt(uint64(end), false)
-
-	aba := [2]Hex{uint8(a), uint8(b)}
-
-	Logg.Info().Any("aba", aba).Msg("toHex ending")
-
-	return aba
-}
-
-func StringToHex(s string) (hexNumberInidividual, error) {
-	seperated := strings.Split(s, "#")
-	var runes hexCodeString = []rune(seperated[1])
-
-	if len(runes) > 6 || len(runes) < 5 {
-		return hexNumberInidividual{}, fmt.Errorf("Not a valid Hex Code: %v")
-	}
-
-	shibi := hexNumberInidividual{
-		R: runes.toHex(0, 1),
-		G: runes.toHex(2, 3),
-		B: runes.toHex(4, 5),
-	}
-
-	return shibi, nil
-}
-
-func (h *hexNumberInidividual) RunesToIntArray() RgbNumbersInidividual {
-	var r, g, b uint8
-	for i, val := range h.R {
-		if i == 0 {
-			r = r + uint8(val*16)
-			fmt.Printf("r: %v\n", r)
-		} else {
-			r = r + uint8(val)
-		}
-	}
-	for _, val := range h.G {
-		g = g + uint8(val*16)
-	}
-	for _, val := range h.B {
-		b = b + uint8(val*16)
-	}
-
-	hibi := RgbNumbersInidividual{
-		R: r,
-		G: g,
-		B: b,
-	}
-
-	fmt.Printf("hibi: %v\n", hibi)
-
-	return hibi
-}
-
-func NewRgbFromHex(hexCode string) (hexNumberInidividual, error) {
-	justNumbers, err := StringToHex(hexCode)
-
-	fmt.Printf("justNumbers: %v\n", justNumbers)
-
-	if err != nil {
-		fmt.Errorf("NewHex could not be created: %v", err)
-	}
-	return justNumbers, nil
-}
+type Hex = uint8
+type Red = uint8
+type Green = uint8
+type Blue = uint8
 
 const (
 	_0 = Hex(0x00)
@@ -168,23 +33,153 @@ const (
 	_F = Hex(0x0F)
 )
 
-type Hex = uint8
+type HexToX interface {
+	// HexToRgb() string
+	// HexToHsl() string
+	// HexToHsv() string
+	// toHex(start, end uint8) [2]Hex
+	// RunesToIntArray() RgbNumbersIndividual
+	StringToHex(s string) (HexNumberIndividual, error)
+	NewRgbFromHex(hexCode string) (RgbNumbersIndividual, error)
+}
 
-// const (
-// 	_0 Hex = iota
-// 	_1
-// 	_2
-// 	_3
-// 	_4
-// 	_5
-// 	_6
-// 	_7
-// 	_8
-// 	_9
-// 	_A
-// 	_B
-// 	_C
-// 	_D
-// 	_E
-// 	_F
-// )
+type HexNumberIndividual struct {
+	R [2]Hex
+	G [2]Hex
+	B [2]Hex
+}
+
+type RgbNumbersIndividual struct {
+	R Red
+	G Green
+	B Blue
+}
+
+type NewHexString struct {
+	S string
+}
+
+const hash rune = '#'
+
+type hexNumbersString [6]Hex
+type HexCodeString []rune
+
+func (h HexCodeString) toHex(start, end uint8) [2]Hex {
+	var a, b uint64
+
+	Logg.Debug().
+		Any("start", rune(h[start])-'0').
+		Any("end", rune(h[end])-'0').
+		Bool("String", false).Msg("toHex Old")
+
+	Logg.Debug().
+		Str("start", string(rune(h[start]))).
+		Str("end", string(rune(h[end]))).
+		Bool("String", true).Msg("toHex New")
+
+	stringToInt := func(startOrEnd uint64, isStart bool) (toReplace uint64) {
+		convertAndMultiply := func(hex Hex) uint64 {
+			if isStart {
+				return uint64(hex * 16)
+			} else {
+				return uint64(hex)
+			}
+		}
+		switch alphabeticRune := string(rune(h[startOrEnd])); alphabeticRune {
+		case "0":
+			toReplace = convertAndMultiply(_0)
+		case "1":
+			toReplace = convertAndMultiply(_1)
+		case "2":
+			toReplace = convertAndMultiply(_2)
+		case "3":
+			toReplace = convertAndMultiply(_3)
+		case "4":
+			toReplace = convertAndMultiply(_4)
+		case "5":
+			toReplace = convertAndMultiply(_5)
+		case "6":
+			toReplace = convertAndMultiply(_6)
+		case "7":
+			toReplace = convertAndMultiply(_7)
+		case "8":
+			toReplace = convertAndMultiply(_8)
+		case "9":
+			toReplace = convertAndMultiply(_9)
+		case "A":
+			toReplace = convertAndMultiply(_A)
+		case "B":
+			toReplace = convertAndMultiply(_B)
+		case "C":
+			toReplace = convertAndMultiply(_C)
+		case "D":
+			toReplace = convertAndMultiply(_D)
+		case "E":
+			toReplace = convertAndMultiply(_E)
+		case "F":
+			toReplace = convertAndMultiply(_F)
+		default:
+			var err error
+			toReplace, err = strconv.ParseUint(string(rune(h[startOrEnd])), 10, 8)
+			if err != nil {
+				fmt.Errorf("%v", err)
+			}
+		}
+		return toReplace
+	}
+
+	a = stringToInt(uint64(start), true)
+	b = stringToInt(uint64(end), false)
+
+	aba := [2]Hex{uint8(a), uint8(b)}
+
+	Logg.Debug().Any("aba", aba).Msg("toHex ending")
+
+	return aba
+}
+func (h *HexNumberIndividual) RunesToIntArray() RgbNumbersIndividual {
+	// Logg.Debug().Any("R", h.R).Msg("Start of RunesToIntArray")
+	// Logg.Debug().Any("G", h.G).Msg("Start of RunesToIntArray")
+	// Logg.Debug().Any("B", h.B).Msg("Start of RunesToIntArray")
+
+	var r, g, b uint8
+	for _, val := range h.R {
+		r = r + val
+	}
+	for _, val := range h.G {
+		g = g + val
+	}
+	for _, val := range h.B {
+		b = b + val
+	}
+
+	return RgbNumbersIndividual{
+		R: r,
+		G: g,
+		B: b,
+	}
+}
+
+func StringToHex(s string) (HexNumberIndividual, error) {
+	separated := strings.Split(s, "#")
+	var runes HexCodeString = []rune(separated[1])
+
+	if len(runes) > 6 || len(runes) < 5 {
+		return HexNumberIndividual{}, fmt.Errorf("Not a valid Hex Code: %v")
+	}
+
+	return HexNumberIndividual{
+		R: runes.toHex(0, 1),
+		G: runes.toHex(2, 3),
+		B: runes.toHex(4, 5),
+	}, nil
+}
+
+func NewRgbFromHex(hexCode string) (RgbNumbersIndividual, error) {
+	justNumbers, err := StringToHex(hexCode)
+	if err != nil {
+		fmt.Errorf("NewHex could not be created: %v", err)
+	}
+
+	return justNumbers.RunesToIntArray(), nil
+}

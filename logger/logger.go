@@ -29,7 +29,7 @@ type Option func(*Config)
 
 func initDefaults() {
 	cfg = &Config{
-		level:      zerolog.InfoLevel,
+		level:      zerolog.DebugLevel,
 		isPretty:   true,
 		writer:     os.Stdout,
 		timeFormat: time.Kitchen,
